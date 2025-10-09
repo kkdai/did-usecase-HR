@@ -406,4 +406,16 @@ router.post('/generateVC', function(req, res, next) {
 
 });
 
+router.get('/support_checkin', function(req, res, next) {
+  res.render('support_checkin', { 
+    title: '運動補助'
+  });
+});
+
+router.get('/subsidy_checkin', function(req, res, next) {
+  res.render('subsidy_checkin', { 
+    title: '育兒補助'
+  });
+});
+
 module.exports = router;
