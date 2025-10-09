@@ -85,7 +85,7 @@ router.post('/checkStatus', async function(req, res, next) {
 
     const options = {
       hostname: 'verifier-sandbox.wallet.gov.tw',
-      path: `/api/oidvp/result?transaction_id=${transactionId}&response_code=%20&ref=${verifierRef}`,
+      path: `/api/oidvp/result?transactionId=${transactionId}&response_code=%20&ref=${verifierRef}`,
       method: 'GET',
       headers: {
         'accept': '*/*',
