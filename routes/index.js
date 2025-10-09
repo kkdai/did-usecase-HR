@@ -16,7 +16,7 @@ router.get('/', function(req, res, next) {
     };
   }
   res.render('index', { 
-    title: '豆泥卡申請',
+    title: '連線小學堂 - HR 數位憑證測試',
     checkinCount: record.checkin_count
   });
 });
@@ -62,7 +62,13 @@ router.post('/checkStatus', async function(req, res, next) {
     
     var verified = false;
     // Call verification API to check status
-    const config = require('../config');
+    const config = {
+      vcSerNum: process.env.VC_SERNUM,
+      vcUid: process.env.VC_UID,
+      issuer_access_token: process.env.ISSUER_ACCESS_TOKEN,
+      verifier_ref: process.env.VERIFIER_REF,
+      verifier_accessToken: process.env.VERIFIER_ACCESS_TOKEN
+    };
     const options = {
       hostname: 'verifier-sandbox.wallet.gov.tw',
       path: `/api/oidvp/result?transaction_id=${transactionId}&response_code=%20`,
@@ -201,7 +207,13 @@ router.post('/getQRCode', function(req, res, next) {
     };
 
     // Load config
-    const config = require('../config');
+    const config = {
+      vcSerNum: process.env.VC_SERNUM,
+      vcUid: process.env.VC_UID,
+      issuer_access_token: process.env.ISSUER_ACCESS_TOKEN,
+      verifier_ref: process.env.VERIFIER_REF,
+      verifier_accessToken: process.env.VERIFIER_ACCESS_TOKEN
+    };
     if (!config.verifier_ref || !config.verifier_accessToken) {
       throw new Error('Invalid configuration');
     }
@@ -291,27 +303,54 @@ router.post('/getQRCode', function(req, res, next) {
 });
 
 router.post('/generateVC', function(req, res, next) {
-  const nickname = req.body.nickname;
-  const birthday = req.body.birthday;
+  const name = req.body.name;
+  const english_name = req.body.english_name;
+  const roc_birthday = req.body.roc_birthday;
+  const join_company = req.body.join_company;
+  const num_children = req.body.num_children;
   // Load config
-  const config = require('../config');
+  const config = {
+    vcSerNum: process.env.VC_SERNUM,
+    vcUid: process.env.VC_UID,
+    issuer_access_token: process.env.ISSUER_ACCESS_TOKEN,
+    verifier_ref: process.env.VERIFIER_REF,
+    verifier_accessToken: process.env.VERIFIER_ACCESS_TOKEN
+  };
 
   // Build VC data payload
   const payload = {
-    vcId: config.vcId,
-    vcCid: config.vcCid,
+    vcId: config.vcSerNum,
+    vcCid: config.vcUid,
     fields: [
       {
         type: "NORMAL",
         cname: "姓名",
-        ename: "nickname", 
-        content: nickname
+        ename: "name", 
+        content: name
+      },
+      {
+        type: "CUSTOM",
+        cname: "英文名字",
+        ename: "english_name",
+        content: english_name
       },
       {
         type: "NORMAL",
-        cname: "生日",
-        ename: "ad_birthday",
-        content: birthday ? (new Date(birthday).toString() === 'Invalid Date' ? '19000101' : new Date(birthday).toISOString().slice(0,10).split('-').join('')) : '19000101'
+        cname: "民國出生年月日",
+        ename: "roc_birthday",
+        content: roc_birthday
+      },
+      {
+        type: "CUSTOM",
+        cname: "入職時間",
+        ename: "join_company",
+        content: join_company
+      },
+      {
+        type: "CUSTOM",
+        cname: "幾個小孩",
+        ename: "num_children",
+        content: num_children
       }
     ]
   };
@@ -324,7 +363,7 @@ router.post('/generateVC', function(req, res, next) {
     headers: {
       'Content-Type': 'application/json',
       'Accept': '*/*',
-      'Access-Token': config.apiKey
+      'Access-Token': config.issuer_access_token
     }
   };
 

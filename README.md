@@ -32,13 +32,21 @@
 
 ## API 發行範例
 
-## 設定檔說明
+## 環境變數設定
 
-請參考 config.sample.js 建立 config.js 檔案，並填入以下資訊:
+本專案已改為使用環境變數進行設定。請複製 `.env.example` 為 `.env` 檔案，並填入以下資訊:
 
-- vcId: 卡片序號，從發行後台取得
-- vcCid: 卡片樣板代號，從發行後台取得  
-- apiKey: API 存取金鑰，從發行後台取得
+```bash
+cp .env.example .env
+```
+
+然後編輯 `.env` 檔案，設定以下環境變數:
+
+- **VC_SERNUM**: 卡片序號，從發行後台取得
+- **VC_UID**: 卡片樣板代號，從發行後台取得  
+- **ISSUER_ACCESS_TOKEN**: 發行者存取權杖，從發行後台取得
+- **VERIFIER_REF**: 驗證器參考碼，從驗證後台取得
+- **VERIFIER_ACCESS_TOKEN**: 驗證器存取權杖，從驗證後台取得
 
 
 ## 啟動服務
