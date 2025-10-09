@@ -104,7 +104,7 @@ router.post('/checkStatus', async function(req, res, next) {
         status = "server-timeout";
         resolve(false);
       
-      }, 3000);
+      }, 10000);
 
       const apiReq = https.request(options, (apiRes) => {
         let data = '';
@@ -206,13 +206,15 @@ router.post('/checkStatus', async function(req, res, next) {
 });
 
 router.post('/getQRCode', function(req, res, next) {
-
+  console.log('[/getQRCode] Received request.');
   try {
     // Generate transaction ID
     const transactionId = uuidv4();
+    console.log('[/getQRCode] Generated transactionId:', transactionId);
 
     // Get subsidy type from request body
     const subsidyType = req.body.subsidyType;
+    console.log('[/getQRCode] Received subsidyType:', subsidyType);
     let verifierRef;
     let verifierAccessToken;
 
@@ -223,8 +225,10 @@ router.post('/getQRCode', function(req, res, next) {
       verifierRef = process.env.VERIFIER_PARENT_REF;
       verifierAccessToken = process.env.VERIFIER_ACCESS_TOKEN; // Assuming same access token for both
     } else {
+      console.error('[/getQRCode] Invalid subsidy type:', subsidyType);
       throw new Error('Invalid subsidy type');
     }
+    console.log('[/getQRCode] Using verifierRef:', verifierRef);
 
     // Load existing record
     const record = require('../record');
@@ -249,11 +253,13 @@ router.post('/getQRCode', function(req, res, next) {
       verifier_accessToken: verifierAccessToken // Use selected verifierAccessToken
     };
     if (!config.verifier_ref || !config.verifier_accessToken) {
+      console.error('[/getQRCode] Invalid configuration: verifier_ref or verifier_accessToken missing.');
       throw new Error('Invalid configuration');
     }
 
     // Call verifier API to get QR code
     const verifierApiUrl = `https://verifier-sandbox.wallet.gov.tw/api/oidvp/qr-code?ref=${config.verifier_ref}&transaction_id=${transactionId}`;
+    console.log('[/getQRCode] Verifier API URL:', verifierApiUrl);
 
     const verifierOptions = {
       headers: {
@@ -262,6 +268,7 @@ router.post('/getQRCode', function(req, res, next) {
         'cache-control': 'no-cache'
       }
     };
+    console.log('[/getQRCode] Verifier API options:', verifierOptions);
 
     // Make API request to get verifier QR code
     https.get(verifierApiUrl, verifierOptions, (verifierRes) => {
@@ -275,6 +282,8 @@ router.post('/getQRCode', function(req, res, next) {
         try {
           // Parse verifier response data
           const verifierData = JSON.parse(data);
+          console.log('[/getQRCode] Verifier API raw response data:', data);
+          console.log('[/getQRCode] Verifier API parsed data:', verifierData);
           if (!verifierData) {
             throw new Error('Invalid response from verifier API');
           }
@@ -287,6 +296,7 @@ router.post('/getQRCode', function(req, res, next) {
           } = verifierData;
 
           if (!auth_uri || !qrcode_image) {
+            console.error('[/getQRCode] Missing required fields in verifier response: auth_uri or qrcode_image.');
             throw new Error('Missing required fields in verifier response');
           }
           
@@ -299,7 +309,9 @@ router.post('/getQRCode', function(req, res, next) {
               path.join(__dirname, '../record.js'),
               'module.exports = ' + JSON.stringify(record, null, 3)
             );
+            console.log('[/getQRCode] Record saved successfully.');
           } catch (err) {
+            console.error('[/getQRCode] Failed to save record:', err);
             throw new Error('Failed to save record');
           }
 
@@ -310,8 +322,10 @@ router.post('/getQRCode', function(req, res, next) {
             auth_uri: auth_uri,
             transaction_id: transactionId
           });
+          console.log('[/getQRCode] Successfully sent QR code data to frontend.');
 
         } catch (err) {
+          console.error('[/getQRCode] Error processing verifier response:', err);
           res.status(500).json({
             error: 'Failed to process verifier response',
             message: err.message
@@ -320,6 +334,7 @@ router.post('/getQRCode', function(req, res, next) {
       });
 
     }).on('error', (err) => {
+      console.error('[/getQRCode] Error calling verifier API:', err);
       res.status(500).json({
         error: 'Failed to call verifier API',
         message: err.message
@@ -327,6 +342,7 @@ router.post('/getQRCode', function(req, res, next) {
     });
 
   } catch (err) {
+    console.error('[/getQRCode] Internal server error:', err);
     res.status(500).json({
       error: 'Internal server error',
       message: err.message
