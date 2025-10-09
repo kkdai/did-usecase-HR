@@ -104,7 +104,7 @@ block content
                     headers: {
                       'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({})
+                    body: JSON.stringify({ subsidyType: 'parent' })
                   });
                   
                   if (!response.ok) throw new Error('Failed to get QR code');

@@ -66,12 +66,21 @@ router.post('/checkStatus', async function(req, res, next) {
       vcSerNum: process.env.VC_SERNUM,
       vcUid: process.env.VC_UID,
       issuer_access_token: process.env.ISSUER_ACCESS_TOKEN,
-      verifier_ref: process.env.VERIFIER_REF,
       verifier_accessToken: process.env.VERIFIER_ACCESS_TOKEN
     };
+
+    let verifierRef;
+    if (checkin.subsidyType === 'sport') {
+      verifierRef = process.env.VERIFIER_SPORT_REF;
+    } else if (checkin.subsidyType === 'parent') {
+      verifierRef = process.env.VERIFIER_PARENT_REF;
+    } else {
+      throw new Error('Invalid subsidy type in pending checkin');
+    }
+
     const options = {
       hostname: 'verifier-sandbox.wallet.gov.tw',
-      path: `/api/oidvp/result?transaction_id=${transactionId}&response_code=%20`,
+      path: `/api/oidvp/result?transaction_id=${transactionId}&response_code=%20&ref=${verifierRef}`,
       method: 'GET',
       headers: {
         'accept': '*/*',
@@ -186,16 +195,32 @@ router.post('/getQRCode', function(req, res, next) {
     // Generate transaction ID
     const transactionId = uuidv4();
 
+    // Get subsidy type from request body
+    const subsidyType = req.body.subsidyType;
+    let verifierRef;
+    let verifierAccessToken;
+
+    if (subsidyType === 'sport') {
+      verifierRef = process.env.VERIFIER_SPORT_REF;
+      verifierAccessToken = process.env.VERIFIER_ACCESS_TOKEN; // Assuming same access token for both
+    } else if (subsidyType === 'parent') {
+      verifierRef = process.env.VERIFIER_PARENT_REF;
+      verifierAccessToken = process.env.VERIFIER_ACCESS_TOKEN; // Assuming same access token for both
+    } else {
+      throw new Error('Invalid subsidy type');
+    }
+
     // Load existing record
     const record = require('../record');
 
-    // Add new checkin with timestamp
+    // Add new checkin with timestamp and subsidyType
     const timestamp = new Date().toISOString().slice(0,19).replace('T',' ');
     record.pending_checkin = record.pending_checkin || {};
     record.pending_checkin[transactionId] = {
       nickname: "<<<NODATA>>>", // Default nickname until verified
       timestamp: timestamp,
       transaction_id: transactionId,
+      subsidyType: subsidyType, // Store subsidy type
       verified: false
     };
 
@@ -204,8 +229,8 @@ router.post('/getQRCode', function(req, res, next) {
       vcSerNum: process.env.VC_SERNUM,
       vcUid: process.env.VC_UID,
       issuer_access_token: process.env.ISSUER_ACCESS_TOKEN,
-      verifier_ref: process.env.VERIFIER_REF,
-      verifier_accessToken: process.env.VERIFIER_ACCESS_TOKEN
+      verifier_ref: verifierRef, // Use selected verifierRef
+      verifier_accessToken: verifierAccessToken // Use selected verifierAccessToken
     };
     if (!config.verifier_ref || !config.verifier_accessToken) {
       throw new Error('Invalid configuration');
