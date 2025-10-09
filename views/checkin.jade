@@ -24,7 +24,6 @@ block content
               li.mb-2 可以重複點蠟，為豆泥加油打氣
               li.mb-2 每根蠟燭可以為豆泥增加一點活力值
               li.mb-2 送出留言後需要使用數位皮夾App掃描驗證授權
-
       .card.bg-light
         .card-body
           h3.h5.fw-bold.mb-3.d-flex.align-items-center
@@ -46,8 +45,6 @@ block content
               - var maxCount = Math.max(...Object.values(checkinRank))
               - var sortedRank = Object.entries(checkinRank).sort((a, b) => b[1] - a[1])
               each entry, index in sortedRank
-                - var name = entry[0]
-                - var count = entry[1]
                 .d-flex.align-items-center.mb-2
                   span.badge.bg-secondary.me-2= index + 1
                   if name === '成獵人'
