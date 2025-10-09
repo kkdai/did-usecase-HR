@@ -2,76 +2,64 @@ extends layout
 
 block content
 
-  h1.text-center 幫豆泥點蠟，直到豆泥燒完
+  h1.text-center 育兒補助
   img.img-fluid.mx-auto.d-block.rounded.mb-4(src="/images/avatar_candle.png" alt="Avatar" style="max-width: 200px")
 
   ul.nav.nav-tabs.mb-4
     li.nav-item
-      a.nav-link(href="/") 申請員工卡(發行)
-    li.nav-item  
+      a.nav-link(href="/") 申請員工卡
+    li.nav-item
+      a.nav-link(href="/support_checkin") 運動補助（驗證)
+    li.nav-item
+      a.nav-link.active(href="/subsidy_checkin") 育兒補助(驗證)  
 
 
   .card.mb-4.shadow-sm
     .card-body
       .alert.alert-primary.mb-4
-        h3.h5.fw-bold.mb-3 幫豆泥點蠟活動說明
+        h3.h5.fw-bold.mb-3 育兒補助說明
         p.text-secondary
-          | 每個人都可以幫豆泥點一根蠟燭，每根蠟燭都能為豆泥增添一分活力！
+          | 提供育兒補助，協助員工平衡家庭與工作。
         .card.mt-3
           .card-body
-            h4.h6.fw-bold.mb-2 活動規則
+            h4.h6.fw-bold.mb-2 相關規定
             ul.text-secondary
-              li.mb-2 可以重複點蠟，為豆泥加油打氣
-              li.mb-2 每根蠟燭可以為豆泥增加一點活力值
-              li.mb-2 送出留言後需要使用數位皮夾App掃描驗證授權
+              li.mb-2 需有一個小孩以上
+              li.mb-2 需到職滿一年
+              li.mb-2 每位子女每年補助上限為 10000 元
+              li.mb-2 需提供子女出生證明
+              li.mb-2 補助範圍包含托嬰中心、幼兒園、保母費用等
       .card.bg-light
         .card-body
           h3.h5.fw-bold.mb-3.d-flex.align-items-center
             span.badge.bg-warning.rounded-circle.me-2.p-2 一
-            | 點蠟情形
+            | 申請狀態
 
           .text-center.mb-4
             .alert.alert-success.mt-3
               i.fas.fa-fire.me-2
-              | 目前豆泥活力值：
-              span.fw-bold #{checkinCount} 點
+              | 目前已申請：
+              span.fw-bold 0 元
 
           h3.h5.fw-bold.mb-3.d-flex.align-items-center
             span.badge.bg-info.rounded-circle.me-2.p-2 二
-            | 點蠟排行榜
+            | 補助排行榜
           
           .card.border-info.mb-4
             .card-body
-              - var maxCount = Math.max(...Object.values(checkinRank))
-              - var sortedRank = Object.entries(checkinRank).sort((a, b) => b[1] - a[1])
-              each entry, index in sortedRank
-                .d-flex.align-items-center.mb-2
-                  span.badge.bg-secondary.me-2= index + 1
-                  if name === '成獵人'
-                    i.fas.fa-dragon.text-danger.me-2
-                  else if count === maxCount
-                    i.fas.fa-crown.text-warning.me-2
-                  else if count >= 10
-                    i.fas.fa-star.text-success.me-2  
-                  else if count >= 5
-                    i.fas.fa-heart.text-info.me-2
-                  else
-                    i.fas.fa-smile.text-primary.me-2
-                  span.fw-bold.me-2= name
-                  span.badge(class=count >= 10 ? 'bg-success' : count >= 5 ? 'bg-info' : 'bg-primary')
-                    | #{count} 次
+              p.text-center.text-muted 尚無資料
 
           h3.h5.fw-bold.mb-3.d-flex.align-items-center
             span.badge.bg-success.rounded-circle.me-2.p-2 三
-            | 留言點蠟
+            | 申請補助
 
           .mb-4
             form#checkinForm.mx-auto(style="max-width: 480px")
               .mb-3
-                textarea#message.form-control(rows="3" placeholder="在此輸入打氣訊息..." required)
+                textarea#message.form-control(rows="3" placeholder="請填寫申請事由..." required)
               button#submitBtn.btn.btn-warning.w-100(type="submit") 
                 i.fas.fa-heart.me-2
-                | 為豆泥加油
+                | 送出申請
 
               #qrcodeContainer.text-center.mt-3(style="display:none")
                 a#qrcodeLink(href="#")
@@ -86,7 +74,7 @@ block content
               br
               #sucmsg.alert.alert-success.alert-dismissible.fade.show.mb-4(role="alert")
                 i.fas.fa-check-circle.me-2
-                | 已成功幫豆泥點蠟
+                | 已成功送出申請
                 button.btn-close(type="button" data-bs-dismiss="alert" aria-label="Close")
             script.
               // Initialize page functionality when document is ready
@@ -177,22 +165,11 @@ block content
 
           h3.h5.fw-bold.mb-3.d-flex.align-items-center
             span.badge.bg-danger.rounded-circle.me-2.p-2 四
-            | 最近打氣留言
+            | 最近申請紀錄
 
           .card.border-secondary
             .card-body
-              - var recentCheckins = checkins.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-              each checkin in recentCheckins
-                .d-flex.align-items-start.mb-3
-                  i.fas.fa-comment.text-secondary.me-2.mt-1
-                  div
-                    .d-flex.align-items-center.mb-1
-                      span.fw-bold.me-2
-                        if checkin.nickname === '成獵人'
-                          i.fas.fa-dragon.text-warning.me-1
-                        = checkin.nickname
-                      small.text-muted= new Date(new Date(checkin.timestamp).getTime() + 16*60*60*1000).toISOString().replace('T', ' ').slice(0, 19)
-                    p.mb-0= checkin.message
+              p.text-center.text-muted 尚無資料
 
 
   .alert.alert-light.mt-4
