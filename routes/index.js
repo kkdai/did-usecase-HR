@@ -85,12 +85,13 @@ router.post('/checkStatus', async function(req, res, next) {
 
     const options = {
       hostname: 'verifier-sandbox.wallet.gov.tw',
-      path: `/api/oidvp/result?transactionId=${transactionId}&response_code=%20&ref=${verifierRef}`,
-      method: 'GET',
+      path: `/api/oidvp/result`,
+      method: 'POST',
       headers: {
         'accept': '*/*',
         'access-token': config.verifier_accessToken,
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+        'Content-Type': 'application/json'
       }
     };
     console.log('[/checkStatus] Verifier API options:', options);
@@ -137,6 +138,7 @@ router.post('/checkStatus', async function(req, res, next) {
         resolve(false);
       });
 
+      apiReq.write(JSON.stringify({ transactionId: transactionId, ref: verifierRef }));
       apiReq.end();
     });
     console.log('[/checkStatus] Verification result:', verified);
