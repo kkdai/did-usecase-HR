@@ -38,7 +38,8 @@ block content
             .alert.alert-success.mt-3
               i.fas.fa-fire.me-2
               | 目前已申請：
-              span.fw-bold 0 元
+              span.fw-bold
+                | #{checkins.filter(c => c.subsidyType === 'sport' && c.verified).length * 5000} 元
 
           h3.h5.fw-bold.mb-3.d-flex.align-items-center
             span.badge.bg-info.rounded-circle.me-2.p-2 二
@@ -46,7 +47,14 @@ block content
           
           .card.border-info.mb-4
             .card-body
-              p.text-center.text-muted 尚無資料
+              if Object.keys(checkinRank).length > 0
+                ul.list-group.list-group-flush
+                  each count, nickname in checkinRank
+                    li.list-group-item.d-flex.justify-content-between.align-items-center
+                      | #{nickname}
+                      span.badge.bg-primary.rounded-pill #{count}
+              else
+                p.text-center.text-muted 尚無資料
 
           h3.h5.fw-bold.mb-3.d-flex.align-items-center
             span.badge.bg-success.rounded-circle.me-2.p-2 三

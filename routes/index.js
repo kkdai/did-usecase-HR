@@ -425,14 +425,42 @@ router.post('/generateVC', function(req, res, next) {
 });
 
 router.get('/support_checkin', function(req, res, next) {
+  let record;
+  try {
+    record = require('../record');
+  } catch (err) {
+    record = {
+      checkin: [],
+      checkin_count: 0,
+      checking_rank: {},
+      pending_checkin: {}
+    };
+  }
   res.render('support_checkin', { 
-    title: '運動補助'
+    title: '運動補助',
+    checkins: record.checkin,
+    checkinRank: record.checking_rank,
+    status: req.query.status
   });
 });
 
 router.get('/subsidy_checkin', function(req, res, next) {
+  let record;
+  try {
+    record = require('../record');
+  } catch (err) {
+    record = {
+      checkin: [],
+      checkin_count: 0,
+      checking_rank: {},
+      pending_checkin: {}
+    };
+  }
   res.render('subsidy_checkin', { 
-    title: '育兒補助'
+    title: '育兒補助',
+    checkins: record.checkin,
+    checkinRank: record.checking_rank,
+    status: req.query.status
   });
 });
 
