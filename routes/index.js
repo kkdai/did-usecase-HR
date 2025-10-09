@@ -54,9 +54,12 @@ router.get('/checkin', function(req, res, next) {
 });
 
 router.post('/checkStatus', async function(req, res, next) {
+  console.log('[/checkStatus] Received request.');
   const transactionId = req.body.transaction_id;
+  console.log('[/checkStatus] transactionId:', transactionId);
   const record = require('../record');
   const checkin = record.pending_checkin[transactionId];
+  console.log('[/checkStatus] checkin object:', checkin);
   let status = "";
   if (checkin) {
     
@@ -75,8 +78,10 @@ router.post('/checkStatus', async function(req, res, next) {
     } else if (checkin.subsidyType === 'parent') {
       verifierRef = process.env.VERIFIER_PARENT_REF;
     } else {
+      console.error('[/checkStatus] Invalid subsidy type in pending checkin:', checkin.subsidyType);
       throw new Error('Invalid subsidy type in pending checkin');
     }
+    console.log('[/checkStatus] Using verifierRef:', verifierRef);
 
     const options = {
       hostname: 'verifier-sandbox.wallet.gov.tw',
@@ -88,10 +93,12 @@ router.post('/checkStatus', async function(req, res, next) {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
       }
     };
+    console.log('[/checkStatus] Verifier API options:', options);
 
     let name = "";
     verified = await new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
+        console.error('[/checkStatus] Verifier API request timed out.');
         apiReq.destroy();
         status = "server-timeout";
         resolve(false);
@@ -107,8 +114,10 @@ router.post('/checkStatus', async function(req, res, next) {
 
         apiRes.on('end', () => {
           clearTimeout(timeout);
+          console.log('[/checkStatus] Verifier API raw response data:', data);
           try {
             const result = JSON.parse(data);
+            console.log('[/checkStatus] Verifier API parsed result:', result);
             if (result.code === 0 && result.verify_result === true) {
               name = result.data[0].claims.find(claim => claim.ename === 'nickname')?.value || '';
               resolve(true);
@@ -116,6 +125,7 @@ router.post('/checkStatus', async function(req, res, next) {
               resolve(false);
             }
           } catch (err) {
+            console.error('[/checkStatus] Error parsing verifier API response:', err);
             resolve(false);
           }
         });
@@ -123,12 +133,13 @@ router.post('/checkStatus', async function(req, res, next) {
 
       apiReq.on('error', (error) => {
         clearTimeout(timeout);
+        console.error('[/checkStatus] Error calling verifier API:', error);
         resolve(false);
       });
 
       apiReq.end();
     });
-    console.log('Verification result:', verified);
+    console.log('[/checkStatus] Verification result:', verified);
     // If verified, move checkin to main list and clean up old pending checkins
     if (verified) {
       try {
@@ -175,16 +186,19 @@ router.post('/checkStatus', async function(req, res, next) {
         
         // Write updated record back to file
         fs.writeFileSync('./record.js', `module.exports = ${JSON.stringify(record, null, 3)}`);
+        console.log('[/checkStatus] Record updated and saved.');
 
         res.json({ verified: true });
       } catch (err) {
-        console.error('Error updating record:', err);
+        console.error('[/checkStatus] Error updating record:', err);
         res.status(500).json({ error: 'Failed to update record' });
       }
     } else {
+      console.log('[/checkStatus] Verification failed or checkin not found.');
       res.status(200).json({ error: status ?? 'Checkin not found' });
     }
   } else {
+    console.log('[/checkStatus] Checkin not found for transactionId:', transactionId);
     res.status(404).json({ error: status ?? 'Checkin not found' });
   }
 });

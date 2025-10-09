@@ -129,7 +129,9 @@ block content
                   document.getElementById('submitBtn').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                   // Start polling for results every 5 seconds
+                  console.log('Starting polling for transactionId:', currentTransactionId);
                   pollingInterval = setInterval(async () => {
+                    console.log('Polling for status...');
                     try {
                       const pollResponse = await fetch('/checkStatus', {
                         method: 'POST',
@@ -139,12 +141,19 @@ block content
                         body: JSON.stringify({ transaction_id: currentTransactionId })
                       });
                       
-                      if (pollResponse.ok) {
-                        const result = await pollResponse.json();
-                        if (result.verified) {
-                          clearInterval(pollingInterval);
-                          window.location.href = window.location.pathname + '?status=success';
-                        }
+                      if (!pollResponse.ok) {
+                        console.error('Polling fetch failed with status:', pollResponse.status);
+                        return;
+                      }
+
+                      const result = await pollResponse.json();
+                      console.log('Polling result:', result);
+                      if (result.verified) {
+                        console.log('Verification successful, clearing polling interval.');
+                        clearInterval(pollingInterval);
+                        window.location.href = window.location.pathname + '?status=success';
+                      } else if (result.error) {
+                        console.log('Verification error:', result.error);
                       }
                     } catch (err) {
                       console.error('Polling error:', err);
@@ -153,6 +162,7 @@ block content
 
                   document.getElementById('submitBtn').onclick = (e) => {
                     e.preventDefault();
+                    console.log('Cancelling polling interval.');
                     clearInterval(pollingInterval);
                     document.getElementById('submitBtn').innerHTML = '<i class="fas fa-heart me-2"></i>為豆泥加油';
                     document.getElementById('submitBtn').onclick = null;
