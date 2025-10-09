@@ -54,8 +54,6 @@ block content
 
           .mb-4
             form#checkinForm.mx-auto(style="max-width: 480px")
-              .mb-3
-                textarea#message.form-control(rows="3" placeholder="" required)
               button#submitBtn.btn.btn-warning.w-100(type="submit") 
                 i.fas.fa-heart.me-2
                 | 送出申請
@@ -95,7 +93,6 @@ block content
               
               form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const message = document.getElementById('message').value;
 
                 document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>送出中 請稍後...';
 
@@ -106,7 +103,7 @@ block content
                     headers: {
                       'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ message })
+                    body: JSON.stringify({})
                   });
                   
                   if (!response.ok) throw new Error('Failed to get QR code');
@@ -117,7 +114,6 @@ block content
                   document.getElementById('qrcodeLink').href = data.auth_uri;
                   document.getElementById('deeplink').href = data.auth_uri;
                   qrcodeContainer.style.display = 'block';
-                  document.getElementById('message').readOnly = true;
                   document.getElementById('submitBtn').innerHTML = '<i class="fas fa-undo me-2"></i>取消重新留言';
                   
 
@@ -149,8 +145,6 @@ block content
                   document.getElementById('submitBtn').onclick = (e) => {
                     e.preventDefault();
                     clearInterval(pollingInterval);
-                    document.getElementById('message').value = '';
-                    document.getElementById('message').readOnly = false;
                     document.getElementById('submitBtn').innerHTML = '<i class="fas fa-heart me-2"></i>為豆泥加油';
                     document.getElementById('submitBtn').onclick = null;
                     qrcodeContainer.style.display = 'none';
