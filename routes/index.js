@@ -185,12 +185,6 @@ router.post('/getQRCode', function(req, res, next) {
   try {
     // Generate transaction ID
     const transactionId = uuidv4();
-    
-    // Get message from request body
-    const message = req.body.message;
-    if (!message) {
-      throw new Error('Message is required');
-    }
 
     // Load existing record
     const record = require('../record');
@@ -200,7 +194,6 @@ router.post('/getQRCode', function(req, res, next) {
     record.pending_checkin = record.pending_checkin || {};
     record.pending_checkin[transactionId] = {
       nickname: "<<<NODATA>>>", // Default nickname until verified
-      message: message,
       timestamp: timestamp,
       transaction_id: transactionId,
       verified: false
