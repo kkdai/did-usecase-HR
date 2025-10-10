@@ -110,7 +110,7 @@ block content
                   document.getElementById('qrcodeLink').href = data.auth_uri;
                   document.getElementById('deeplink').href = data.auth_uri;
                   qrcodeContainer.style.display = 'block';
-                  document.getElementById('submitBtn').innerHTML = '<i class="fas fa-undo me-2"></i>取消重新留言';
+                  document.getElementById('submitBtn').innerHTML = '<i class="fas fa-undo me-2"></i>取消申請';
                   
 
                   document.getElementById('submitBtn').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -151,7 +151,7 @@ block content
                     e.preventDefault();
                     console.log('Cancelling polling interval.');
                     clearInterval(pollingInterval);
-                    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-heart me-2"></i>為豆泥加油';
+                    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-heart me-2"></i>送出申請';
                     document.getElementById('submitBtn').onclick = null;
                     qrcodeContainer.style.display = 'none';
                   };
