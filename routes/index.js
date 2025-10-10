@@ -12,8 +12,15 @@ router.get('/', function(req, res, next) {
     record = require('../record');
   } catch (err) {
     record = {
-      checkin_count: 0
+      checkin: [],
+      checkin_count: 0,
+      checking_rank: {},
+      pending_checkin: {}
     };
+    fs.writeFileSync(
+      path.join(__dirname, '../record.js'),
+      'module.exports = ' + JSON.stringify(record, null, 3)
+    );
   }
   res.render('index', { 
     title: '連線小學堂 - HR 數位憑證測試',
@@ -57,7 +64,21 @@ router.post('/checkStatus', async function(req, res, next) {
   console.log('[/checkStatus] Received request.');
   const transactionId = req.body.transaction_id;
   console.log('[/checkStatus] transactionId:', transactionId);
-  const record = require('../record');
+  let record;
+  try {
+    record = require('../record');
+  } catch (err) {
+    record = {
+      checkin: [],
+      checkin_count: 0,
+      checking_rank: {},
+      pending_checkin: {}
+    };
+    fs.writeFileSync(
+      path.join(__dirname, '../record.js'),
+      'module.exports = ' + JSON.stringify(record, null, 3)
+    );
+  }
   const checkin = record.pending_checkin[transactionId];
   console.log('[/checkStatus] checkin object:', checkin);
   let status = "";
@@ -231,7 +252,21 @@ router.post('/getQRCode', function(req, res, next) {
     console.log('[/getQRCode] Using verifierRef:', verifierRef);
 
     // Load existing record
-    const record = require('../record');
+    let record;
+    try {
+      record = require('../record');
+    } catch (err) {
+      record = {
+        checkin: [],
+        checkin_count: 0,
+        checking_rank: {},
+        pending_checkin: {}
+      };
+      fs.writeFileSync(
+        path.join(__dirname, '../record.js'),
+        'module.exports = ' + JSON.stringify(record, null, 3)
+      );
+    }
 
     // Add new checkin with timestamp and subsidyType
     const timestamp = new Date().toISOString().slice(0,19).replace('T',' ');
@@ -430,8 +465,15 @@ router.post('/generateVC', function(req, res, next) {
         record = require('../record');
       } catch (err) {
         record = {
-          checkin_count: 0
+          checkin: [],
+          checkin_count: 0,
+          checking_rank: {},
+          pending_checkin: {}
         };
+        fs.writeFileSync(
+          path.join(__dirname, '../record.js'),
+          'module.exports = ' + JSON.stringify(record, null, 3)
+        );
       }      
       if (resp.statusCode === 201) {
         const responseJson = JSON.parse(data);
@@ -469,6 +511,10 @@ router.get('/support_checkin', function(req, res, next) {
       checking_rank: {},
       pending_checkin: {}
     };
+    fs.writeFileSync(
+      path.join(__dirname, '../record.js'),
+      'module.exports = ' + JSON.stringify(record, null, 3)
+    );
   }
   res.render('support_checkin', { 
     title: '運動補助',
@@ -489,6 +535,10 @@ router.get('/subsidy_checkin', function(req, res, next) {
       checking_rank: {},
       pending_checkin: {}
     };
+    fs.writeFileSync(
+      path.join(__dirname, '../record.js'),
+      'module.exports = ' + JSON.stringify(record, null, 3)
+    );
   }
   res.render('subsidy_checkin', { 
     title: '育兒補助',
