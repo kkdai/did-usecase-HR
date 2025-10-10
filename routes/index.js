@@ -435,12 +435,14 @@ router.post('/generateVC', function(req, res, next) {
       }      
       if (resp.statusCode === 201) {
         const responseJson = JSON.parse(data);
-        const qrCodeData = {
-          expired: responseJson.expired,
-          qrCode: responseJson.qrCode,
-          deepLink: responseJson.deepLink
-        };
-        res.render('qrcode', { title: '豆泥卡申請', qrCodeData: qrCodeData, checkinCount: record.checkin_count, skip:1});        
+        res.render('qrcode', { 
+          title: '豆泥卡申請', 
+          qrCodeData: qrCodeData, 
+          checkinCount: record.checkin_count,
+          checkins: record.checkin,
+          checkinRank: record.checking_rank,
+          skip:1
+        });        
       } else {
         res.render('qrcode', { title: '豆泥卡申請', qrCodeData: qrCodeData, checkinCount: record.checkin_count, skip:1});        
       }

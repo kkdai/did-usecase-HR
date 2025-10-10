@@ -6,13 +6,41 @@ block content
 
   ul.nav.nav-tabs.mb-4
     li.nav-item
-      a.nav-link.active(href="/") 申請員工卡(發行)
-    li.nav-item  
+      a.nav-link.active(href="/") 申請員工卡
+    li.nav-item
+      a.nav-link(href="/support_checkin") 運動補助（驗證)
+    li.nav-item
+      a.nav-link(href="/subsidy_checkin") 育兒補助(驗證)  
   
 
 
   div(style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 24px; margin-bottom: 24px")
+    h3.h5.fw-bold.mb-3.d-flex.align-items-center
+      span.badge.bg-warning.rounded-circle.me-2.p-2 一
+      | 申請狀態
+
+    .text-center.mb-4
+      .alert.alert-success.mt-3
+        i.fas.fa-fire.me-2
+        | 目前已申請：
+        span.fw-bold
+          | #{checkins.filter(c => c.verified).length} 次
+
+    h3.h5.fw-bold.mb-3.d-flex.align-items-center
+      span.badge.bg-info.rounded-circle.me-2.p-2 二
+      | 補助排行榜
     
+    .card.border-info.mb-4
+      .card-body
+        if Object.keys(checkinRank).length > 0
+          ul.list-group.list-group-flush
+            each count, nickname in checkinRank
+              li.list-group-item.d-flex.justify-content-between.align-items-center
+                | #{nickname}
+                span.badge.bg-primary.rounded-pill #{count}
+        else
+          p.text-center.text-muted 尚無資料
+
     div(style="margin-bottom: 32px; background: #f9fafb; padding: 24px; border-radius: 8px; border-left: 4px solid #3b82f6")
       h3(style="font-size: 20px; font-weight: 600; margin-bottom: 16px") 關於數位部數位皮夾計畫
       p(style="color: #374151; line-height: 1.6")
