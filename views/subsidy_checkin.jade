@@ -42,20 +42,7 @@ block content
               span.fw-bold
                 | #{checkins.filter(c => c.subsidyType === 'parent' && c.verified).length * 10000} 元
 
-          h3.h5.fw-bold.mb-3.d-flex.align-items-center
-            span.badge.bg-info.rounded-circle.me-2.p-2 二
-            | 補助排行榜
-          
-          .card.border-info.mb-4
-            .card-body
-              if Object.keys(checkinRank).length > 0
-                ul.list-group.list-group-flush
-                  each count, nickname in checkinRank
-                    li.list-group-item.d-flex.justify-content-between.align-items-center
-                      | #{nickname}
-                      span.badge.bg-primary.rounded-pill #{count}
-              else
-                p.text-center.text-muted 尚無資料
+
 
           h3.h5.fw-bold.mb-3.d-flex.align-items-center
             span.badge.bg-success.rounded-circle.me-2.p-2 三
@@ -175,13 +162,7 @@ block content
                 }
               });
 
-          h3.h5.fw-bold.mb-3.d-flex.align-items-center
-            span.badge.bg-danger.rounded-circle.me-2.p-2 四
-            | 最近申請紀錄
 
-          .card.border-secondary
-            .card-body
-              p.text-center.text-muted 尚無資料
 
 
   .alert.alert-light.mt-4
